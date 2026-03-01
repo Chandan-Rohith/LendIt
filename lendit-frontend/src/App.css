@@ -566,3 +566,176 @@ body {
 .page-placeholder p {
   color: var(--text-light);
 }
+
+/* ===== Profile Page ===== */
+.profile-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--sky-blue);
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: var(--shadow);
+}
+
+.profile-name {
+  font-size: 1.75rem;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+
+.profile-city {
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 640px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.profile-card-title {
+  font-size: 1rem;
+  color: var(--navy);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--sky-blue);
+  font-weight: 600;
+}
+
+.profile-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.profile-field-icon {
+  color: var(--teal);
+  margin-top: 4px;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+.profile-field-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.profile-field-value {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.profile-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.profile-stat:last-child {
+  margin-bottom: 0;
+}
+
+.profile-stat-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.profile-stat-icon.star-icon {
+  color: var(--warning);
+}
+
+.profile-stat-icon.shield-icon {
+  color: var(--teal);
+}
+
+.profile-stat-icon.score-icon {
+  color: var(--text-light);
+}
+
+.profile-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.2;
+}
+
+.profile-stat-label {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+/* Risk badges */
+.risk-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.risk-low {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.risk-medium {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.risk-high {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.profile-actions {
+  max-width: 300px;
+  margin: 0 auto;
+}
