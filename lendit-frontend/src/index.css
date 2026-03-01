@@ -1,0 +1,7 @@
+/* Reset — index.css is intentionally minimal; all styles live in App.css */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
