@@ -7,9 +7,8 @@ import '../App.css';
 const ReviewForm = ({ bookingId, onReviewSubmitted }) => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [comment, setComment] = useState('');
-  const [damageReport, setDamageReport] = useState('');
-  const [complaintFlag, setComplaintFlag] = useState(false);
+  const [remarks, setRemarks] = useState('');
+  const [damageReport, setDamageReport] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,13 +21,13 @@ const ReviewForm = ({ bookingId, onReviewSubmitted }) => {
     setLoading(true);
     setError('');
     try {
-      await submitReview({
+      const payload = {
         bookingId,
-        rating,
-        comment,
-        damageReport: damageReport || null,
-        complaintFlag,
-      });
+        rating: Number(rating),
+        remarks: remarks || null,
+        damageReport: Boolean(damageReport),
+      };
+      await submitReview(payload);
       onReviewSubmitted();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to submit review.');
@@ -55,32 +54,32 @@ const ReviewForm = ({ bookingId, onReviewSubmitted }) => {
           ))}
         </div>
         <div className="form-group">
-          <label>Comment</label>
+          <label>Remarks (optional)</label>
           <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
             placeholder="Write your review..."
             rows={3}
-          />
-        </div>
-        <div className="form-group">
-          <label>Damage Report (optional)</label>
-          <textarea
-            value={damageReport}
-            onChange={(e) => setDamageReport(e.target.value)}
-            placeholder="Report any damage..."
-            rows={2}
           />
         </div>
         <div className="form-group checkbox-group">
           <label>
             <input
               type="checkbox"
-              checked={complaintFlag}
-              onChange={(e) => setComplaintFlag(e.target.checked)}
+              checked={damageReport}
+              onChange={(e) => setDamageReport(e.target.checked)}
             />
-            Flag this user for misconduct
+            Report damage
           </label>
+        </div>
+        <div className="form-group">
+          <label>Remarks / Complaint (optional)</label>
+          <textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Write your review or describe a complaint..."
+            rows={4}
+          />
         </div>
         <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? 'Submitting...' : 'Submit Review'}

@@ -200,15 +200,12 @@ POST /api/reviews
 {
   "bookingId": 12,
   "rating": 4,           // 1-5, required
-  "remarks": "Great tool, worked perfectly",  // optional
-  "damageReport": false,  // optional, boolean
-  "complaintFlag": false   // optional, boolean
+  "remarks": "Great tool, worked perfectly",  // optional (also used for complaints)
+  "damageReport": false  // optional, boolean
 }
 ```
 
-**NOTE:** Looking at the existing ReviewForm component, it currently sends `comment` and `damageReport` as strings. The backend's `ReviewRequest` expects `remarks` (string), `damageReport` (boolean), and `complaintFlag` (boolean). **You may need to update ReviewForm.jsx slightly** to match the backend DTO field names. Check:
-- ReviewForm sends `comment` → backend expects `remarks`
-- ReviewForm sends `damageReport` as string → backend expects boolean
+**NOTE:** The review form should send `remarks` (string) and `damageReport` (boolean). We consolidated complaint text into the `remarks` field, so use a single "Remarks / Complaint" textarea for both.
 
 #### UI suggestions:
 - List each booking as a card showing: tool name, tool image, dates, status badge, owner name

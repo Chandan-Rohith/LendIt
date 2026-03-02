@@ -28,8 +28,8 @@ public class ReviewService {
         Booking booking = bookingRepository.findById(request.getBookingId())
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        if (booking.getStatus() != BookingStatus.ACCEPTED) {
-            throw new RuntimeException("Can only review accepted bookings");
+        if (booking.getStatus() != BookingStatus.COMPLETED) {
+            throw new RuntimeException("Can only review completed bookings");
         }
 
         // Check if already reviewed
@@ -54,14 +54,13 @@ public class ReviewService {
                 .orElseThrow(() -> new RuntimeException("Reviewee not found"));
 
         Review review = Review.builder()
-                .booking(booking)
-                .reviewer(reviewer)
-                .reviewee(reviewee)
-                .rating(request.getRating())
-                .damageReport(request.getDamageReport())
-                .complaintFlag(request.getComplaintFlag())
-                .remarks(request.getRemarks())
-                .build();
+            .booking(booking)
+            .reviewer(reviewer)
+            .reviewee(reviewee)
+            .rating(request.getRating())
+            .damageReport(request.getDamageReport())
+            .remarks(request.getRemarks())
+            .build();
 
         reviewRepository.save(review);
 

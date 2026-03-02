@@ -70,7 +70,14 @@ const RegisterPage = () => {
       login(token, { userId, fullName, email });
       navigate('/home');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      const apiData = err.response?.data;
+      let msg = 'Registration failed. Please try again.';
+      if (apiData) {
+        if (apiData.error) msg = apiData.error; // RuntimeException paths
+        else if (typeof apiData === 'object') msg = Object.values(apiData).join(' '); // validation map
+        else msg = String(apiData);
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }

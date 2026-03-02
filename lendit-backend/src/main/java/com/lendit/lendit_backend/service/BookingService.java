@@ -56,7 +56,7 @@ public class BookingService {
 
         // Check for overlapping accepted bookings
         List<Booking> overlapping = bookingRepository.findOverlappingBookings(
-                request.getToolId(), request.getStartDate(), request.getEndDate(), BookingStatus.ACCEPTED);
+            request.getToolId(), request.getStartDate(), request.getEndDate(), BookingStatus.APPROVED);
 
         if (!overlapping.isEmpty()) {
             throw new RuntimeException("Tool is already booked for some of the selected dates");
@@ -114,7 +114,7 @@ public class BookingService {
     private BookingResponse mapToResponse(Booking booking, Long currentUserId) {
         boolean canReview = false;
 
-        if (booking.getStatus() == BookingStatus.ACCEPTED) {
+        if (booking.getStatus() == BookingStatus.COMPLETED) {
             // Check if current user already reviewed this booking
             canReview = reviewRepository.findByBookingIdAndReviewerId(booking.getId(), currentUserId).isEmpty();
         }

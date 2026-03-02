@@ -22,7 +22,5 @@ public class ReviewRequest {
 
     private Boolean damageReport = false;
 
-    private Boolean complaintFlag = false;
-
     private String remarks;
 }
