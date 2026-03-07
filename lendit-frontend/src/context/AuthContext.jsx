@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [location, setLocation] = useState(null);
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
@@ -19,6 +20,15 @@ export const AuthProvider = ({ children }) => {
       setUser(JSON.parse(savedUser));
     }
     setLoading(false);
+  }, []);
+
+  // Request fresh geolocation every time the site is opened
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      (err) => console.error('Location error:', err.message)
+    );
   }, []);
 
   const login = (tokenVal, userData) => {
@@ -38,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!token;
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated, loading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated, loading, location }}>
       {children}
     </AuthContext.Provider>
   );
