@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ToolRequest {
+public class ToolRequest 
+{
 
     @NotBlank(message = "Tool name is required")
     private String name;

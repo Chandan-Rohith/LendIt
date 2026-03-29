@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { getTools, getCategories, searchTools, getToolsByCategory } from '../api/api';
 import ToolCard from '../components/ToolCard';
 import '../App.css';
@@ -10,31 +11,40 @@ const HomePage = () => {
   const [keyword, setKeyword] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchTools();
-    fetchCategories();
-  }, []);
+  const { location } = useAuth();
 
-  const fetchTools = async () => {
-    setLoading(true);
-    try {
-      const res = await getTools();
-      setTools(res.data);
-    } catch (err) {
-      console.error('Failed to fetch tools', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await getCategories();
       setCategories(res.data);
     } catch (err) {
       console.error('Failed to fetch categories', err);
     }
-  };
+  }, []);
+
+  const fetchTools = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await getTools(location);
+      setTools(res.data);
+    } catch (err) {
+      console.error('Failed to fetch tools', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    fetchTools();
+    fetchCategories();
+  }, [fetchTools, fetchCategories]);
+
+  // Re-fetch tools when ephemeral location becomes available so distances update
+  useEffect(() => {
+    fetchTools();
+  }, [fetchTools]);
+
+  
 
   const handleSearch = async () => {
     if (!keyword.trim()) {
@@ -43,7 +53,7 @@ const HomePage = () => {
     }
     setLoading(true);
     try {
-      const res = await searchTools(keyword);
+      const res = await searchTools(keyword, location);
       setTools(res.data);
     } catch (err) {
       console.error('Search failed', err);
@@ -60,7 +70,7 @@ const HomePage = () => {
     }
     setLoading(true);
     try {
-      const res = await getToolsByCategory(categoryId);
+      const res = await getToolsByCategory(categoryId, location);
       setTools(res.data);
     } catch (err) {
       console.error('Category filter failed', err);

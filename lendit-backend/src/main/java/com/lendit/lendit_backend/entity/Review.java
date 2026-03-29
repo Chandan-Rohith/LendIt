@@ -49,9 +49,11 @@ public class Review
     @Column(nullable = false)
     private Integer rating;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean damageReport = false;
+    @Column(name = "tool_condition")
+    private Integer toolCondition;
+
+    @Column(name = "experience")
+    private Integer experience;
 
     @Column(columnDefinition = "TEXT")
     private String remarks;

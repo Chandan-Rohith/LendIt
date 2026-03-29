@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookingResponse {
+public class BookingResponse 
+{
     private Long id;
     private Long toolId;
     private String toolName;

@@ -2,6 +2,8 @@ package com.lendit.lendit_backend.service;
 
 import org.springframework.stereotype.Service;
 
+import com.lendit.lendit_backend.dto.UpdateContactInfoRequest;
+import com.lendit.lendit_backend.dto.UpdateLocationRequest;
 import com.lendit.lendit_backend.dto.UserProfileResponse;
 import com.lendit.lendit_backend.entity.RiskScore;
 import com.lendit.lendit_backend.entity.User;
@@ -33,6 +35,7 @@ public class UserService
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .city(user.getCity())
+                .address(user.getAddress())
                 .latitude(user.getLatitude())
                 .longitude(user.getLongitude())
                 .averageRating(avgRating != null ? avgRating : 0.0)
@@ -44,5 +47,34 @@ public class UserService
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public UserProfileResponse updateLocation(Long userId, UpdateLocationRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setLatitude(request.getLatitude());
+        user.setLongitude(request.getLongitude());
+        userRepository.save(user);
+
+        return getProfile(userId);
+    }
+
+    public UserProfileResponse updateContactInfo(Long userId, UpdateContactInfoRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String nextEmail = request.getEmail().trim();
+        if (!nextEmail.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmail(nextEmail)) {
+            throw new RuntimeException("Email already registered");
+        }
+
+        user.setEmail(nextEmail);
+        user.setPhone(request.getPhone().trim());
+        user.setCity(request.getCity().trim());
+        user.setAddress(request.getAddress().trim());
+        userRepository.save(user);
+
+        return getProfile(userId);
     }
 }

@@ -1,0 +1,22 @@
+features:
+  - avg_rating
+  - review_count
+  - avg_damage
+  - avg_experience
+
+label_rule:
+  avg_rating_threshold: 3.0
+  avg_damage_threshold: 2.0
+  avg_experience_threshold: 2.5
+
+thresholds:
+  low: 33
+  medium: 66
+
+model:
+  version: v1
+
+training:
+  test_size: 0.2
+  random_state: 42
+  max_iter: 1000

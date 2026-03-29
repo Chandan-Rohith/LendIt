@@ -81,35 +81,40 @@ public class ToolService {
         return mapToResponse(tool, null);
     }
 
-    public List<ToolResponse> getToolsNearUser(Long userId) 
+        public List<ToolResponse> getToolsNearUser(Long userId, Double lat, Double lng) 
     {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        double sourceLat = (lat != null) ? lat : user.getLatitude();
+        double sourceLng = (lng != null) ? lng : user.getLongitude();
 
         List<Tool> tools = toolRepository.findToolsWithinRadius(
-                user.getLatitude(), user.getLongitude(), userId);
+            sourceLat, sourceLng, userId);
 
         return tools.stream()
-                .map(tool -> {
-                    double distance = calculateDistance(
-                            user.getLatitude(), user.getLongitude(),
-                            tool.getOwner().getLatitude(), tool.getOwner().getLongitude());
-                    return mapToResponse(tool, distance);
-                })
-                .collect(Collectors.toList());
+            .map(tool -> {
+                double distance = calculateDistance(
+                    sourceLat, sourceLng,
+                    tool.getOwner().getLatitude(), tool.getOwner().getLongitude());
+                return mapToResponse(tool, distance);
+            })
+            .collect(Collectors.toList());
     }
 
-    public List<ToolResponse> getToolsByCategory(Long categoryId, Long userId) 
+    public List<ToolResponse> getToolsByCategory(Long categoryId, Long userId, Double lat, Double lng) 
     {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        double sourceLat = (lat != null) ? lat : user.getLatitude();
+        double sourceLng = (lng != null) ? lng : user.getLongitude();
 
         List<Tool> tools = toolRepository.findByCategoryIdExcludingOwner(categoryId, userId);
 
         return tools.stream()
                 .map(tool -> {
                     double distance = calculateDistance(
-                            user.getLatitude(), user.getLongitude(),
+                            sourceLat, sourceLng,
                             tool.getOwner().getLatitude(), tool.getOwner().getLongitude());
                     if (distance <= 10) {
                         return mapToResponse(tool, distance);
@@ -121,16 +126,19 @@ public class ToolService {
                 .collect(Collectors.toList());
     }
 
-    public List<ToolResponse> searchTools(String keyword, Long userId) {
+    public List<ToolResponse> searchTools(String keyword, Long userId, Double lat, Double lng) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        double sourceLat = (lat != null) ? lat : user.getLatitude();
+        double sourceLng = (lng != null) ? lng : user.getLongitude();
 
         List<Tool> tools = toolRepository.searchByKeyword(keyword, userId);
 
         return tools.stream()
                 .map(tool -> {
                     double distance = calculateDistance(
-                            user.getLatitude(), user.getLongitude(),
+                            sourceLat, sourceLng,
                             tool.getOwner().getLatitude(), tool.getOwner().getLongitude());
                     if (distance <= 10) {
                         return mapToResponse(tool, distance);
@@ -142,22 +150,25 @@ public class ToolService {
                 .collect(Collectors.toList());
     }
 
-    public ToolResponse getToolById(Long toolId, Long userId) {
+        public ToolResponse getToolById(Long toolId, Long userId, Double lat, Double lng) {
         Tool tool = toolRepository.findById(toolId)
-                .orElseThrow(() -> new RuntimeException("Tool not found"));
+            .orElseThrow(() -> new RuntimeException("Tool not found"));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        double sourceLat = (lat != null) ? lat : user.getLatitude();
+        double sourceLng = (lng != null) ? lng : user.getLongitude();
 
         double distance = calculateDistance(
-                user.getLatitude(), user.getLongitude(),
-                tool.getOwner().getLatitude(), tool.getOwner().getLongitude());
+            sourceLat, sourceLng,
+            tool.getOwner().getLatitude(), tool.getOwner().getLongitude());
 
         return mapToResponse(tool, distance);
-    }
+        }
 
     public List<ToolResponse> getMyTools(Long ownerId) {
-        List<Tool> tools = toolRepository.findByOwnerId(ownerId);
+        List<Tool> tools = toolRepository.findByOwnerIdOrderByCreatedAtDescIdDesc(ownerId);
         return tools.stream()
                 .map(tool -> mapToResponse(tool, 0.0))
                 .collect(Collectors.toList());

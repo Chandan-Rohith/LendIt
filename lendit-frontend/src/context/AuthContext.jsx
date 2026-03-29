@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { updateMyLocation } from '../api/api';
 
 const AuthContext = createContext();
 
@@ -11,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState(null);
+  const lastSyncedLocationRef = useRef(null);
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
@@ -25,11 +27,27 @@ export const AuthProvider = ({ children }) => {
   // Request fresh geolocation every time the site is opened
   useEffect(() => {
     if (!navigator.geolocation) return;
+
     navigator.geolocation.getCurrentPosition(
       (pos) => setLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      (err) => console.error('Location error:', err.message)
+      (err) => console.error('Location error:', err.message),
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000,
+      }
     );
   }, []);
+
+  useEffect(() => {
+    // Do NOT auto-sync browser geolocation to the server here.
+    // Auto-updating the user's stored latitude/longitude will change
+    // the owner's location for tools and break distance calculations.
+    // Keep location in context for client-side features (nearby search,
+    // distance calc) and only update the server via explicit user actions
+    // (e.g., profile edit or when creating a tool).
+    return;
+  }, [token, location]);
 
   const login = (tokenVal, userData) => {
     localStorage.setItem('token', tokenVal);

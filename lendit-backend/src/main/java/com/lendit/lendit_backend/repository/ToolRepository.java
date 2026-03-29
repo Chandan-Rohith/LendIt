@@ -13,6 +13,8 @@ public interface ToolRepository extends JpaRepository<Tool, Long>
 
     List<Tool> findByOwnerId(Long ownerId);
 
+        List<Tool> findByOwnerIdOrderByCreatedAtDescIdDesc(Long ownerId);
+
     List<Tool> findByCategoryId(Long categoryId);
 
     @Query("SELECT t FROM Tool t WHERE t.category.id = :categoryId AND t.owner.id != :userId")

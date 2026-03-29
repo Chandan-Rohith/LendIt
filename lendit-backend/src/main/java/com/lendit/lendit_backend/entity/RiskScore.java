@@ -50,7 +50,8 @@ public class RiskScore
 
     @PrePersist
     @PreUpdate
-    protected void onUpdate() {
+    protected void onUpdate() 
+    {
         lastCalculated = LocalDateTime.now();
     }
 

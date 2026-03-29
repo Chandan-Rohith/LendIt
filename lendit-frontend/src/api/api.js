@@ -19,15 +19,42 @@ export const loginUser = (data) => API.post('/auth/login', data);
 
 // User APIs
 export const getProfile = () => API.get('/users/profile');
+export const getUserProfileById = (userId) => API.get(`/users/${userId}`);
+export const updateMyProfile = (data) => API.patch('/users/profile', data);
+export const updateMyLocation = (data) => API.patch('/users/location', data);
 
 // Category APIs
 export const getCategories = () => API.get('/categories');
 
 // Tool APIs
-export const getTools = () => API.get('/tools');
-export const getToolById = (id) => API.get(`/tools/${id}`);
-export const searchTools = (keyword) => API.get(`/tools/search?keyword=${keyword}`);
-export const getToolsByCategory = (categoryId) => API.get(`/tools/category/${categoryId}`);
+export const getTools = (coords) => {
+  if (coords && coords.latitude != null && coords.longitude != null) {
+    return API.get(`/tools?lat=${coords.latitude}&lng=${coords.longitude}`);
+  }
+  return API.get('/tools');
+};
+
+export const getToolById = (id, coords) => {
+  if (coords && coords.latitude != null && coords.longitude != null) {
+    return API.get(`/tools/${id}?lat=${coords.latitude}&lng=${coords.longitude}`);
+  }
+  return API.get(`/tools/${id}`);
+};
+
+export const searchTools = (keyword, coords) => {
+  const base = `/tools/search?keyword=${encodeURIComponent(keyword)}`;
+  if (coords && coords.latitude != null && coords.longitude != null) {
+    return API.get(`${base}&lat=${coords.latitude}&lng=${coords.longitude}`);
+  }
+  return API.get(base);
+};
+
+export const getToolsByCategory = (categoryId, coords) => {
+  if (coords && coords.latitude != null && coords.longitude != null) {
+    return API.get(`/tools/category/${categoryId}?lat=${coords.latitude}&lng=${coords.longitude}`);
+  }
+  return API.get(`/tools/category/${categoryId}`);
+};
 export const getMyTools = () => API.get('/tools/my-tools');
 export const addTool = (formData) => API.post('/tools', formData, {
   headers: { 'Content-Type': 'multipart/form-data' },
@@ -43,5 +70,7 @@ export const updateBookingStatus = (id, status) => API.patch(`/bookings/${id}/st
 
 // Review APIs
 export const submitReview = (data) => API.post('/reviews', data);
+export const getReviewsByBooking = (bookingId) => API.get(`/reviews/booking/${bookingId}`);
+export const getReviewsByTool = (toolId) => API.get(`/reviews/tool/${toolId}`);
 
 export default API;

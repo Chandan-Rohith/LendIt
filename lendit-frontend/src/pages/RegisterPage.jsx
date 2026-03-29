@@ -11,6 +11,7 @@ const RegisterPage = () => {
     phone: '',
     email: '',
     city: '',
+    address: '',
     password: '',
   });
   const [location, setLocation] = useState({ latitude: null, longitude: null });
@@ -69,16 +70,21 @@ const RegisterPage = () => {
       const { token, userId, fullName, email } = response.data;
       login(token, { userId, fullName, email });
       navigate('/home');
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       const apiData = err.response?.data;
       let msg = 'Registration failed. Please try again.';
-      if (apiData) {
-        if (apiData.error) msg = apiData.error; // RuntimeException paths
-        else if (typeof apiData === 'object') msg = Object.values(apiData).join(' '); // validation map
-        else msg = String(apiData);
+      if (apiData) 
+      {
+          if (apiData.error) msg = apiData.error; // RuntimeException paths
+          else if (typeof apiData === 'object') msg = Object.values(apiData).join(' '); // validation map
+          else msg = String(apiData);
       }
       setError(msg);
-    } finally {
+    } 
+    finally 
+    {
       setLoading(false);
     }
   };
@@ -155,6 +161,17 @@ const RegisterPage = () => {
               value={formData.city}
               onChange={handleChange}
               placeholder="Enter your city"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Address</label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              placeholder="Enter your address"
               required
             />
           </div>

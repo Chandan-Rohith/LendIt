@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { FiStar, FiMapPin } from 'react-icons/fi';
+import { FiStar, FiMapPin, FiTrash2 } from 'react-icons/fi';
 import '../App.css';
 
-const ToolCard = ({ tool }) => {
+const ToolCard = ({ tool, onDelete }) => {
   const navigate = useNavigate();
 
   const imageUrl = tool.photoUrl
@@ -17,10 +17,20 @@ const ToolCard = ({ tool }) => {
         {!tool.available && <span className="badge unavailable">Unavailable</span>}
       </div>
       <div className="tool-card-body">
-        <h3 className="tool-card-title">{tool.name}</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+          <h3 className="tool-card-title">{tool.name}</h3>
+          {onDelete && (
+            <button
+              className="btn btn-danger tool-card-delete"
+              onClick={(e) => { e.stopPropagation(); onDelete(tool.id); }}
+            >
+              <FiTrash2 size={14} /> Delete
+            </button>
+          )}
+        </div>
         <p className="tool-card-category">{tool.categoryName}</p>
         <div className="tool-card-meta">
-          <span className="tool-card-price">₹{tool.pricePerDay}/day</span>
+          {/* <span className="tool-card-price">₹{tool.pricePerDay}/day</span> */}
           {tool.distance !== undefined && tool.distance !== null && (
             <span className="tool-card-distance">
               <FiMapPin size={14} /> {tool.distance.toFixed(1)} km
@@ -42,12 +52,13 @@ ToolCard.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     categoryName: PropTypes.string,
-    pricePerDay: PropTypes.number,
+    // pricePerDay: PropTypes.number,
     photoUrl: PropTypes.string,
     available: PropTypes.bool,
     distance: PropTypes.number,
     ownerRating: PropTypes.number,
   }).isRequired,
+  onDelete: PropTypes.func,
 };
 
 export default ToolCard;

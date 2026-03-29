@@ -21,14 +21,12 @@ public class DataSeeder implements CommandLineRunner {
         if (categoryRepository.count() == 0) {
             List<Category> categories = List.of(
                     Category.builder().name("Power Tools").build(),
-                    Category.builder().name("Garden Tools").build(),
-                    Category.builder().name("Construction Tools").build(),
-                    Category.builder().name("Cleaning Tools").build(),
-                    Category.builder().name("Automotive Tools").build(),
-                    Category.builder().name("Electrical Tools").build(),
-                    Category.builder().name("Miscellaneous").build()
+                    Category.builder().name("Hand Tools").build(),
+                    Category.builder().name("Garden").build(),
+                    Category.builder().name("Automotive").build(),
+                    Category.builder().name("Home & Cleaning").build()
             );
-            categoryRepository.saveAll(categories);
+            categories.forEach(categoryRepository::save);
             System.out.println("✅ Categories seeded successfully!");
         }
     }

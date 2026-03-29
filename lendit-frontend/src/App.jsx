@@ -16,7 +16,8 @@ import MyOrdersPage from './pages/MyOrdersPage';
 import MyToolsPage from './pages/MyToolsPage';
 import ProfilePage from './pages/ProfilePage';
 
-function App() {
+function App() 
+{
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { isAuthenticated } = useAuth();
   const location = useLocation();
@@ -47,6 +48,7 @@ function App() {
           <Route path="/my-orders" element={<ProtectedRoute><MyOrdersPage /></ProtectedRoute>} />
           <Route path="/my-tools" element={<ProtectedRoute><MyToolsPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/profile/:userId" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         </Routes>
       </main>
     </div>

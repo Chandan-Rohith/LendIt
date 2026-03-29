@@ -24,7 +24,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
-public class BookingController {
+public class BookingController 
+{
 
     private final BookingService bookingService;
     private final JwtUtil jwtUtil;
@@ -32,21 +33,24 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<BookingResponse> createBooking(
             @Valid @RequestBody BookingRequest request,
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader) 
+    {
         Long userId = extractUserId(authHeader);
         return ResponseEntity.ok(bookingService.createBooking(request, userId));
     }
 
     @GetMapping("/my-orders")
     public ResponseEntity<List<BookingResponse>> getMyOrders(
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader) 
+    {
         Long userId = extractUserId(authHeader);
         return ResponseEntity.ok(bookingService.getMyOrders(userId));
     }
 
     @GetMapping("/my-tools")
     public ResponseEntity<List<BookingResponse>> getBookingsForMyTools(
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader) 
+    {
         Long userId = extractUserId(authHeader);
         return ResponseEntity.ok(bookingService.getBookingsForMyTools(userId));
     }
@@ -54,7 +58,8 @@ public class BookingController {
     @GetMapping("/tool/{toolId}")
     public ResponseEntity<List<BookingResponse>> getBookingsForTool(
             @PathVariable Long toolId,
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader) 
+    {
         Long userId = extractUserId(authHeader);
         return ResponseEntity.ok(bookingService.getBookingsForTool(toolId, userId));
     }
@@ -63,12 +68,14 @@ public class BookingController {
     public ResponseEntity<BookingResponse> updateBookingStatus(
             @PathVariable Long bookingId,
             @RequestParam String status,
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader) 
+    {
         Long userId = extractUserId(authHeader);
         return ResponseEntity.ok(bookingService.updateBookingStatus(bookingId, status, userId));
     }
 
-    private Long extractUserId(String authHeader) {
+    private Long extractUserId(String authHeader) 
+    {
         String token = authHeader.replace("Bearer ", "");
         return jwtUtil.extractUserId(token);
     }

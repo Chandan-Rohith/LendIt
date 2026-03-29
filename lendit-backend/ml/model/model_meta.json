@@ -1,0 +1,57 @@
+{
+  "model_version": "v1",
+  "trained_at": "2026-03-28T18:47:39.202851+00:00",
+  "algorithm": "logistic_regression",
+  "features": [
+    "avg_rating",
+    "review_count",
+    "avg_damage",
+    "avg_experience"
+  ],
+  "thresholds": {
+    "low": 33,
+    "medium": 66
+  },
+  "label_rule": {
+    "avg_rating_threshold": 3.0,
+    "avg_damage_threshold": 2.0,
+    "avg_experience_threshold": 2.5
+  },
+  "training": {
+    "test_size": 0.2,
+    "random_state": 42,
+    "max_iter": 1000,
+    "rows_total": 500,
+    "rows_train": 400,
+    "rows_test": 100,
+    "positive_rate": 0.76,
+    "metrics": {
+      "accuracy": 0.81,
+      "precision": 0.8904,
+      "recall": 0.8553
+    }
+  },
+  "standardization": {
+    "mean": [
+      2.947975,
+      26.18,
+      1.555575,
+      2.00625
+    ],
+    "scale": [
+      1.15919698,
+      13.99294822,
+      0.8543797,
+      0.56646133
+    ]
+  },
+  "weights": {
+    "intercept": 2.732158267252,
+    "coefficients": [
+      -2.400445331141,
+      -0.141622310955,
+      1.861516371999,
+      0.957295402881
+    ]
+  }
+}

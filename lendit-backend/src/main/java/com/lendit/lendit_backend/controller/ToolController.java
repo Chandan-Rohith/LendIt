@@ -31,43 +31,51 @@ public class ToolController {
     private final JwtUtil jwtUtil;
 
     @PostMapping
-    public ResponseEntity<ToolResponse> addTool(
-            @RequestPart("tool") ToolRequest request,
-            @RequestPart(value = "photo", required = false) MultipartFile photo,
-            @RequestHeader("Authorization") String authHeader) {
-        Long userId = extractUserId(authHeader);
-        return ResponseEntity.ok(toolService.addTool(request, photo, userId));
-    }
+        public ResponseEntity<ToolResponse> addTool(
+                @RequestPart("tool") ToolRequest request,
+                @RequestPart(value = "photo", required = false) MultipartFile photo,
+                @RequestHeader("Authorization") String authHeader) {
+            Long userId = extractUserId(authHeader);
+            return ResponseEntity.ok(toolService.addTool(request, photo, userId));
+        }
 
     @GetMapping
     public ResponseEntity<List<ToolResponse>> getToolsNearUser(
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng) {
         Long userId = extractUserId(authHeader);
-        return ResponseEntity.ok(toolService.getToolsNearUser(userId));
+        return ResponseEntity.ok(toolService.getToolsNearUser(userId, lat, lng));
     }
 
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<ToolResponse>> getToolsByCategory(
             @PathVariable Long categoryId,
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng) {
         Long userId = extractUserId(authHeader);
-        return ResponseEntity.ok(toolService.getToolsByCategory(categoryId, userId));
+        return ResponseEntity.ok(toolService.getToolsByCategory(categoryId, userId, lat, lng));
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ToolResponse>> searchTools(
             @RequestParam String keyword,
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng) {
         Long userId = extractUserId(authHeader);
-        return ResponseEntity.ok(toolService.searchTools(keyword, userId));
+        return ResponseEntity.ok(toolService.searchTools(keyword, userId, lat, lng));
     }
 
     @GetMapping("/{toolId}")
     public ResponseEntity<ToolResponse> getToolById(
             @PathVariable Long toolId,
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng) {
         Long userId = extractUserId(authHeader);
-        return ResponseEntity.ok(toolService.getToolById(toolId, userId));
+        return ResponseEntity.ok(toolService.getToolById(toolId, userId, lat, lng));
     }
 
     @GetMapping("/my-tools")
