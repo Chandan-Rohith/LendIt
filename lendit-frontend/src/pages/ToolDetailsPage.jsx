@@ -61,7 +61,8 @@ const ToolDetailsPage = () => {
     }
 
     setBooking(true);
-    try {
+    try 
+    {
       await createBooking({
         toolId: Number(id),
         startDate: formatApiDate(startDate),
@@ -70,10 +71,14 @@ const ToolDetailsPage = () => {
       setSuccess('Booking request submitted successfully! The owner will review it.');
       setStartDate(null);
       setEndDate(null);
-    } catch (err) {
+    }
+     catch (err) 
+    {
       const msg = err.response?.data?.error || err.response?.data?.message || 'Booking failed — dates may conflict';
       setError(msg);
-    } finally {
+    } 
+    finally 
+    {
       setBooking(false);
     }
   };

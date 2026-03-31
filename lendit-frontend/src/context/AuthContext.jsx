@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState(null);
+  const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
   const lastSyncedLocationRef = useRef(null);
 
   useEffect(() => {
@@ -24,19 +25,54 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Request fresh geolocation every time the site is opened
+  // Request fresh geolocation every time the site is opened.
+  // Use the Permissions API to detect whether the browser will prompt,
+  // and set a denied flag so the UI can inform the user when permission
+  // was permanently blocked. Browsers won't let us force a re-prompt if
+  // the user previously selected "Block" — they must change site
+  // settings manually.
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!('geolocation' in navigator)) return;
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      (err) => console.error('Location error:', err.message),
-      {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 10000,
-      }
-    );
+    const request = () => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLocation({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+          setLocationPermissionDenied(false);
+        },
+        (err) => {
+          console.error('Location error:', err.message);
+          if (err.code === 1) setLocationPermissionDenied(true);
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+      );
+    };
+
+    // If Permissions API is supported, check state first
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then((res) => {
+        if (res.state === 'granted' || res.state === 'prompt') {
+          request();
+        } else if (res.state === 'denied') {
+          setLocationPermissionDenied(true);
+        }
+
+        // Listen for changes (user may change site permission in browser UI)
+        res.onchange = () => {
+          if (res.state === 'granted' || res.state === 'prompt') {
+            request();
+          } else if (res.state === 'denied') {
+            setLocationPermissionDenied(true);
+          }
+        };
+      }).catch(() => {
+        // Fallback: try requesting directly
+        request();
+      });
+    } else {
+      // No Permissions API — just request and let browser handle prompting
+      request();
+    }
   }, []);
 
   useEffect(() => {
@@ -66,7 +102,7 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!token;
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated, loading, location }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated, loading, location, locationPermissionDenied }}>
       {children}
     </AuthContext.Provider>
   );

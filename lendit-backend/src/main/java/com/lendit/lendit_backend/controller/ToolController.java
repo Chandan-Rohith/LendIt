@@ -80,7 +80,8 @@ public class ToolController {
 
     @GetMapping("/my-tools")
     public ResponseEntity<List<ToolResponse>> getMyTools(
-            @RequestHeader("Authorization") String authHeader) {
+            @RequestHeader("Authorization") String authHeader) 
+    {
         Long userId = extractUserId(authHeader);
         return ResponseEntity.ok(toolService.getMyTools(userId));
     }

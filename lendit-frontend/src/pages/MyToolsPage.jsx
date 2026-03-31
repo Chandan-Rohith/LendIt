@@ -14,7 +14,8 @@ const statusColors = {
 };
 
 const getRecentValue = (item) => {
-  if (item?.createdAt) {
+  if (item?.createdAt) 
+  {
     const createdAtTime = new Date(item.createdAt).getTime();
     if (!Number.isNaN(createdAtTime)) return createdAtTime;
   }
@@ -41,23 +42,33 @@ const MyToolsPage = () => {
   };
 
   const fetchTools = useCallback(async () => {
-    try {
+    try 
+    {
       const res = await getMyTools();
       setTools(res.data);
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       setError(getApiError(err, 'Failed to load your tools'));
-    } finally {
+    } 
+    finally 
+    {
       setLoadingTools(false);
     }
   }, []);
 
   const fetchBookings = useCallback(async () => {
-    try {
+    try 
+    {
       const res = await getMyToolBookings();
       setBookings(res.data);
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       setError(getApiError(err, 'Failed to load booking requests'));
-    } finally {
+    } 
+    finally 
+    {
       setLoadingBookings(false);
     }
   }, []);
@@ -69,22 +80,28 @@ const MyToolsPage = () => {
 
   const handleDelete = async (toolId) => {
     if (!window.confirm('Are you sure you want to delete this tool?')) return;
-    try {
+    try 
+    {
       await deleteTool(toolId);
       setTools((prev) => prev.filter((t) => t.id !== toolId));
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       setError(getApiError(err, 'Failed to delete tool'));
     }
   };
 
   const handleStatusChange = async (bookingId, status) => {
     setError('');
-    try {
+    try 
+    {
       const res = await updateBookingStatus(bookingId, status);
       setBookings((prev) =>
         prev.map((b) => (b.id === bookingId ? res.data : b))
       );
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       setError(getApiError(err, 'Failed to update booking status'));
     }
   };
@@ -146,7 +163,8 @@ const MyToolsPage = () => {
         </div>
       ) : (
         <div style={{ display: 'grid', gap: 16 }}>
-          {sortedBookings.map((booking) => {
+          {
+            sortedBookings.map((booking) => {
             const statusStyle = statusColors[booking.status] || {};
 
             return (

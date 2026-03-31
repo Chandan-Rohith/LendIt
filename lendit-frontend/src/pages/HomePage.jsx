@@ -14,15 +14,23 @@ const HomePage = () => {
   const { location } = useAuth();
 
   const fetchCategories = useCallback(async () => {
-    try {
+    try 
+    {
       const res = await getCategories();
       setCategories(res.data);
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       console.error('Failed to fetch categories', err);
     }
   }, []);
 
   const fetchTools = useCallback(async () => {
+    // Wait for live browser location before fetching. If `location` is
+    // null it means we haven't obtained coordinates yet (or the user
+    // hasn't allowed them) — do not make the tools request.
+    if (!location || location.latitude == null || location.longitude == null) return;
+
     setLoading(true);
     try {
       const res = await getTools(location);
@@ -35,14 +43,14 @@ const HomePage = () => {
   }, [location]);
 
   useEffect(() => {
-    fetchTools();
     fetchCategories();
-  }, [fetchTools, fetchCategories]);
+  }, [fetchCategories]);
 
-  // Re-fetch tools when ephemeral location becomes available so distances update
+  // Fetch nearby tools only after a live location is available.
   useEffect(() => {
+    if (!location || location.latitude == null || location.longitude == null) return;
     fetchTools();
-  }, [fetchTools]);
+  }, [location, fetchTools]);
 
   
 
@@ -51,6 +59,11 @@ const HomePage = () => {
       fetchTools();
       return;
     }
+    if (!location || location.latitude == null || location.longitude == null) {
+      setTools([]);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await searchTools(keyword, location);
@@ -68,6 +81,12 @@ const HomePage = () => {
       fetchTools();
       return;
     }
+    if (!location || location.latitude == null || location.longitude == null) 
+      {
+      setTools([]);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await getToolsByCategory(categoryId, location);
@@ -83,6 +102,9 @@ const HomePage = () => {
     <div className="home-page">
       <div className="home-header">
         <h2>Browse Tools Nearby</h2>
+        {(!location || location.latitude == null || location.longitude == null) && (
+          <p className="loading">Allow location access to view tools within 10 km of your current position.</p>
+        )}
         <div className="search-bar">
           <input
             type="text"

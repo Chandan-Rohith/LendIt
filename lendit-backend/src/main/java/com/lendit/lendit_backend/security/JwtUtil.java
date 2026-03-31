@@ -24,7 +24,8 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateToken(String email, Long userId) {
+    public String generateToken(String email, Long userId) 
+    {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("userId", userId)
@@ -34,15 +35,18 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extractEmail(String token) {
+    public String extractEmail(String token) 
+    {
         return getClaims(token).getSubject();
     }
 
-    public Long extractUserId(String token) {
+    public Long extractUserId(String token) 
+    {
         return getClaims(token).get("userId", Long.class);
     }
 
-    public boolean isTokenValid(String token, String email) {
+    public boolean isTokenValid(String token, String email) 
+    {
         return extractEmail(token).equals(email) && !isTokenExpired(token);
     }
 
