@@ -86,8 +86,11 @@ public class ToolService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        double sourceLat = (lat != null) ? lat : user.getLatitude();
-        double sourceLng = (lng != null) ? lng : user.getLongitude();
+        if (lat == null || lng == null) {
+            throw new RuntimeException("Location required to fetch nearby tools");
+        }
+        double sourceLat = lat;
+        double sourceLng = lng;
 
         List<Tool> tools = toolRepository.findToolsWithinRadius(
             sourceLat, sourceLng, userId);
@@ -106,8 +109,11 @@ public class ToolService {
     {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        double sourceLat = (lat != null) ? lat : user.getLatitude();
-        double sourceLng = (lng != null) ? lng : user.getLongitude();
+        if (lat == null || lng == null) {
+            throw new RuntimeException("Location required to fetch nearby tools");
+        }
+        double sourceLat = lat;
+        double sourceLng = lng;
 
         List<Tool> tools = toolRepository.findByCategoryIdExcludingOwner(categoryId, userId);
 
@@ -130,8 +136,11 @@ public class ToolService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        double sourceLat = (lat != null) ? lat : user.getLatitude();
-        double sourceLng = (lng != null) ? lng : user.getLongitude();
+        if (lat == null || lng == null) {
+            throw new RuntimeException("Location required to fetch nearby tools");
+        }
+        double sourceLat = lat;
+        double sourceLng = lng;
 
         List<Tool> tools = toolRepository.searchByKeyword(keyword, userId);
 
@@ -157,8 +166,11 @@ public class ToolService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        double sourceLat = (lat != null) ? lat : user.getLatitude();
-        double sourceLng = (lng != null) ? lng : user.getLongitude();
+        if (lat == null || lng == null) {
+            throw new RuntimeException("Location required to fetch tool details");
+        }
+        double sourceLat = lat;
+        double sourceLng = lng;
 
         double distance = calculateDistance(
             sourceLat, sourceLng,

@@ -21,6 +21,11 @@ const ToolDetailsPage = () => {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
+    // ✅ Wait for live browser location before querying tool details.
+    // If location is null/undefined, do not make the request — backend will
+    // reject it anyway and use DB coords would violate the location-mandatory design.
+    if (!location || location.latitude == null || location.longitude == null) return;
+
     const fetchData = async () => {
       try {
         const [toolRes, datesRes] = await Promise.all([
@@ -104,8 +109,31 @@ const ToolDetailsPage = () => {
         {/* LEFT COLUMN */}
         <div>
           {/* Tool Image (rounded top corners only so info card can visually attach) */}
-          <div style={{ borderRadius: '16px 16px 0 0', overflow: 'hidden', marginBottom: 0, background: 'var(--sky-blue)', maxHeight: 420 }}>
-            <img src={imageUrl} alt={tool.name} style={{ width: '100%', maxHeight: 420, objectFit: 'cover', display: 'block' }} />
+          <div
+            style={{
+              borderRadius: '16px 16px 0 0',
+              overflow: 'hidden',
+              marginBottom: 0,
+              background: '#eef4f8',
+              // height: 420,
+              height:260,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '16px'
+            }}
+          >
+            <img
+              src={imageUrl}
+              alt={tool.name}
+              // style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
+              style={{maxWidth: '100%',
+        maxHeight: '100%',
+        width: 'auto',
+        height: 'auto',
+        objectFit: 'contain'
+      }}
+            />
           </div>
 
           {/* Tool Info Card */}
