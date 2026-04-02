@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { updateMyLocation } from '../api/api';
 
 const AuthContext = createContext();
 
@@ -13,7 +12,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [location, setLocation] = useState(null);
   const [locationPermissionDenied, setLocationPermissionDenied] = useState(false);
-  const lastSyncedLocationRef = useRef(null);
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
