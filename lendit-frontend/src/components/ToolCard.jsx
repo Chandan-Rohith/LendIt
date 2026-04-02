@@ -2,13 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { FiStar, FiMapPin, FiTrash2 } from 'react-icons/fi';
 import '../App.css';
+import { createFallbackImage } from '../utils/fallbackImage';
 
 const ToolCard = ({ tool, onDelete }) => {
   const navigate = useNavigate();
 
   const imageUrl = tool.photoUrl
     ? `http://localhost:8080${tool.photoUrl}`
-    : 'https://via.placeholder.com/300x200?text=No+Image';
+    : createFallbackImage('No Image', 300, 200);
 
   return (
     <div className="tool-card" onClick={() => navigate(`/tools/${tool.id}`)}>

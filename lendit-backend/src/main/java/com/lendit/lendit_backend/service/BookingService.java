@@ -182,7 +182,9 @@ public class BookingService
                 .id(booking.getId())
                 .toolId(booking.getTool().getId())
                 .toolName(booking.getTool().getName())
-                .toolPhotoUrl(booking.getTool().getPhotoUrl())
+            .toolPhotoUrl(booking.getTool().getImage() != null
+                ? "/api/tools/" + booking.getTool().getId() + "/image"
+                : null)
                 .ownerName(booking.getTool().getOwner().getFullName())
                 .ownerId(booking.getTool().getOwner().getId())
                 .borrowerName(booking.getBorrower().getFullName())

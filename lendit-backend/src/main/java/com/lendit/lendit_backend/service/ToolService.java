@@ -1,15 +1,10 @@
 package com.lendit.lendit_backend.service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -41,23 +36,33 @@ public class ToolService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public ToolResponse addTool(ToolRequest request, MultipartFile photo, Long ownerId) 
-    {
+    public ToolResponse addTool(ToolRequest request, MultipartFile image, Long ownerId) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        String photoUrl = null;
-        if (photo != null && !photo.isEmpty()) {
-            photoUrl = savePhoto(photo);
+        byte[] imageBytes = null;
+        String imageType = null;
+        if (image != null && !image.isEmpty()) {
+            imageType = image.getContentType();
+            if (imageType != null && !imageType.startsWith("image/")) {
+                throw new RuntimeException("Only image files are allowed");
+            }
+
+            try {
+                imageBytes = image.getBytes();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read image", e);
+            }
         }
 
         Tool tool = Tool.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .photoUrl(photoUrl)
+                .image(imageBytes)
+                .imageType(imageType)
                 .category(category)
                 .owner(owner)
                 .available(true)
@@ -81,9 +86,14 @@ public class ToolService {
         return mapToResponse(tool, null);
     }
 
+    public Tool getToolEntity(Long toolId) {
+        return toolRepository.findById(toolId)
+                .orElseThrow(() -> new RuntimeException("Tool not found"));
+    }
+
         public List<ToolResponse> getToolsNearUser(Long userId, Double lat, Double lng) 
     {
-        User user = userRepository.findById(userId)
+            userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (lat == null || lng == null) {
@@ -107,8 +117,8 @@ public class ToolService {
 
     public List<ToolResponse> getToolsByCategory(Long categoryId, Long userId, Double lat, Double lng) 
     {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
         if (lat == null || lng == null) {
             throw new RuntimeException("Location required to fetch nearby tools");
         }
@@ -133,8 +143,8 @@ public class ToolService {
     }
 
     public List<ToolResponse> searchTools(String keyword, Long userId, Double lat, Double lng) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (lat == null || lng == null) {
             throw new RuntimeException("Location required to fetch nearby tools");
@@ -163,8 +173,8 @@ public class ToolService {
         Tool tool = toolRepository.findById(toolId)
             .orElseThrow(() -> new RuntimeException("Tool not found"));
 
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (lat == null || lng == null) {
             throw new RuntimeException("Location required to fetch tool details");
@@ -223,7 +233,7 @@ public class ToolService {
                 .id(tool.getId())
                 .name(tool.getName())
                 .description(tool.getDescription())
-                .photoUrl(tool.getPhotoUrl())
+                .photoUrl(tool.getImage() != null ? buildImageUrl(tool.getId()) : null)
                 .categoryName(tool.getCategory().getName())
                 .categoryId(tool.getCategory().getId())
                 .ownerName(tool.getOwner().getFullName())
@@ -234,21 +244,7 @@ public class ToolService {
                 .build();
     }
 
-    private String savePhoto(MultipartFile photo) {
-        try {
-            String uploadDir = "uploads";
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            String fileName = UUID.randomUUID() + "_" + photo.getOriginalFilename();
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(photo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            return "/uploads/" + fileName;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save photo", e);
-        }
+    private String buildImageUrl(Long toolId) {
+        return "/api/tools/" + toolId + "/image";
     }
 }

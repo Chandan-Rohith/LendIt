@@ -2,7 +2,11 @@ package com.lendit.lendit_backend.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,13 +35,32 @@ public class ToolController {
     private final JwtUtil jwtUtil;
 
     @PostMapping
-        public ResponseEntity<ToolResponse> addTool(
-                @RequestPart("tool") ToolRequest request,
-                @RequestPart(value = "photo", required = false) MultipartFile photo,
-                @RequestHeader("Authorization") String authHeader) {
-            Long userId = extractUserId(authHeader);
-            return ResponseEntity.ok(toolService.addTool(request, photo, userId));
+    public ResponseEntity<ToolResponse> addTool(
+            @RequestPart("tool") ToolRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestHeader("Authorization") String authHeader) {
+        Long userId = extractUserId(authHeader);
+        return ResponseEntity.ok(toolService.addTool(request, image, userId));
+    }
+
+    @GetMapping("/{toolId}/image")
+    public ResponseEntity<byte[]> getToolImage(@PathVariable Long toolId) {
+        var tool = toolService.getToolEntity(toolId);
+
+        if (tool.getImage() == null || tool.getImage().length == 0) {
+            return ResponseEntity.notFound().build();
         }
+
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if (tool.getImageType() != null) {
+            mediaType = MediaType.parseMediaType(Objects.requireNonNull(tool.getImageType()));
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(Objects.requireNonNull(mediaType));
+
+        return new ResponseEntity<>(tool.getImage(), headers, HttpStatus.OK);
+    }
 
     @GetMapping
     public ResponseEntity<List<ToolResponse>> getToolsNearUser(

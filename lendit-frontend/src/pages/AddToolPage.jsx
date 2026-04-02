@@ -12,7 +12,7 @@ const AddToolPage = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [photo, setPhoto] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -69,8 +69,8 @@ const AddToolPage = () => {
         'tool',
         new Blob([JSON.stringify(toolData)], { type: 'application/json' })
       );
-      if (photo) {
-        formData.append('photo', photo);
+      if (imageFile) {
+        formData.append('image', imageFile);
       }
 
       await addTool(formData);
@@ -126,11 +126,11 @@ const AddToolPage = () => {
           </div>
 
           <div className="form-group">
-            <label><FiUpload size={14} style={{ marginRight: 6 }} />Photo</label>
+            <label><FiUpload size={14} style={{ marginRight: 6 }} />Image</label>
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setPhoto(e.target.files[0] || null)}
+              onChange={(e) => setImageFile(e.target.files[0] || null)}
             />
           </div>
 

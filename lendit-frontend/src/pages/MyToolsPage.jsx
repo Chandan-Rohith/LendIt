@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
+import { FiPlus, FiCheck, FiX } from 'react-icons/fi';
 import ToolCard from '../components/ToolCard';
 import ReviewForm from '../components/ReviewForm';
 import { getMyTools, deleteTool, getMyToolBookings, updateBookingStatus} from '../api/api';
 import { formatDisplayDate } from '../utils/date';
+import { createFallbackImage } from '../utils/fallbackImage';
 
 const statusColors = {
   PENDING: { background: '#fff3cd', color: '#856404', border: '#ffeeba' },
@@ -214,7 +215,7 @@ const MyToolsPage = () => {
                   <div style={{ display: 'flex', gap: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', gap: 14, flex: '1 1 420px', minWidth: 260 }}>
                       <img
-                        src={booking.toolPhotoUrl ? `http://localhost:8080${booking.toolPhotoUrl}` : 'https://via.placeholder.com/120x120?text=No+Image'}
+                        src={booking.toolPhotoUrl ? `http://localhost:8080${booking.toolPhotoUrl}` : createFallbackImage('No Image', 120, 120)}
                         alt={booking.toolName}
                         style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #e7e7e7' }}
                       />

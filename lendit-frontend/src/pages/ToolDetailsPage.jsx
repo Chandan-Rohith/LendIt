@@ -6,6 +6,7 @@ import { FiStar, FiMapPin, FiCalendar } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { getToolById, getBlockedDates, createBooking, getReviewsByTool } from '../api/api';
 import { formatApiDate, formatDisplayDate } from '../utils/date';
+import { createFallbackImage } from '../utils/fallbackImage';
 
 const ToolDetailsPage = () => {
   const { id } = useParams();
@@ -93,7 +94,7 @@ const ToolDetailsPage = () => {
 
   const imageUrl = tool.photoUrl
     ? `http://localhost:8080${tool.photoUrl}`
-    : 'https://via.placeholder.com/600x350?text=No+Image';
+    : createFallbackImage('No Image', 600, 350);
 
   const sortedReviews = [...reviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const latestReview = sortedReviews[0] || null;

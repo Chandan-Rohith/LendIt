@@ -2,6 +2,7 @@ package com.lendit.lendit_backend.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -37,7 +39,12 @@ public class Tool {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String photoUrl;
+    @Lob
+    @Basic
+    @Column(name = "image", columnDefinition = "LONGBLOB")
+    private byte[] image;
+
+    private String imageType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
