@@ -64,7 +64,7 @@ public class ToolController {
 
     @GetMapping
     public ResponseEntity<List<ToolResponse>> getToolsNearUser(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(required = false) Double lat,
             @RequestParam(required = false) Double lng) {
         Long userId = extractUserId(authHeader);
@@ -74,7 +74,7 @@ public class ToolController {
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<ToolResponse>> getToolsByCategory(
             @PathVariable Long categoryId,
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(required = false) Double lat,
             @RequestParam(required = false) Double lng) {
         Long userId = extractUserId(authHeader);
@@ -84,7 +84,7 @@ public class ToolController {
     @GetMapping("/search")
     public ResponseEntity<List<ToolResponse>> searchTools(
             @RequestParam String keyword,
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(required = false) Double lat,
             @RequestParam(required = false) Double lng) {
         Long userId = extractUserId(authHeader);
@@ -94,7 +94,7 @@ public class ToolController {
     @GetMapping("/{toolId}")
     public ResponseEntity<ToolResponse> getToolById(
             @PathVariable Long toolId,
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam(required = false) Double lat,
             @RequestParam(required = false) Double lng) {
         Long userId = extractUserId(authHeader);
@@ -124,7 +124,14 @@ public class ToolController {
     }
 
     private Long extractUserId(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
         String token = authHeader.replace("Bearer ", "");
-        return jwtUtil.extractUserId(token);
+        try {
+            return jwtUtil.extractUserId(token);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -93,39 +93,46 @@ public class ToolService {
 
         public List<ToolResponse> getToolsNearUser(Long userId, Double lat, Double lng) 
     {
-            userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            if (lat == null || lng == null) {
+                throw new RuntimeException("Location required to fetch nearby tools");
+            }
+            double sourceLat = lat;
+            double sourceLng = lng;
 
-        if (lat == null || lng == null) {
-            throw new RuntimeException("Location required to fetch nearby tools");
-        }
-        double sourceLat = lat;
-        double sourceLng = lng;
+            Long repoUserId = userId != null ? userId : -1L;
+            if (userId != null) {
+                userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            }
 
-        List<Tool> tools = toolRepository.findToolsWithinRadius(
-            sourceLat, sourceLng, userId);
+            List<Tool> tools = toolRepository.findToolsWithinRadius(
+                sourceLat, sourceLng, repoUserId);
 
-        return tools.stream()
-            .map(tool -> {
-                double distance = calculateDistance(
-                    sourceLat, sourceLng,
-                    tool.getOwner().getLatitude(), tool.getOwner().getLongitude());
-                return mapToResponse(tool, distance);
-            })
-            .collect(Collectors.toList());
+            return tools.stream()
+                .map(tool -> {
+                    double distance = calculateDistance(
+                        sourceLat, sourceLng,
+                        tool.getOwner().getLatitude(), tool.getOwner().getLongitude());
+                    return mapToResponse(tool, distance);
+                })
+                .collect(Collectors.toList());
     }
 
     public List<ToolResponse> getToolsByCategory(Long categoryId, Long userId, Double lat, Double lng) 
     {
-        userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
         if (lat == null || lng == null) {
             throw new RuntimeException("Location required to fetch nearby tools");
         }
         double sourceLat = lat;
         double sourceLng = lng;
 
-        List<Tool> tools = toolRepository.findByCategoryIdExcludingOwner(categoryId, userId);
+        Long repoUserId = userId != null ? userId : -1L;
+        if (userId != null) {
+            userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        }
+
+        List<Tool> tools = toolRepository.findByCategoryIdExcludingOwner(categoryId, repoUserId);
 
         return tools.stream()
                 .map(tool -> {
@@ -143,16 +150,19 @@ public class ToolService {
     }
 
     public List<ToolResponse> searchTools(String keyword, Long userId, Double lat, Double lng) {
-        userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
         if (lat == null || lng == null) {
             throw new RuntimeException("Location required to fetch nearby tools");
         }
         double sourceLat = lat;
         double sourceLng = lng;
 
-        List<Tool> tools = toolRepository.searchByKeyword(keyword, userId);
+        Long repoUserId = userId != null ? userId : -1L;
+        if (userId != null) {
+            userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        }
+
+        List<Tool> tools = toolRepository.searchByKeyword(keyword, repoUserId);
 
         return tools.stream()
                 .map(tool -> {
@@ -172,13 +182,14 @@ public class ToolService {
         public ToolResponse getToolById(Long toolId, Long userId, Double lat, Double lng) {
         Tool tool = toolRepository.findById(toolId)
             .orElseThrow(() -> new RuntimeException("Tool not found"));
+            if (userId != null) {
+                userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            }
 
-            userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (lat == null || lng == null) {
-            throw new RuntimeException("Location required to fetch tool details");
-        }
+            if (lat == null || lng == null) {
+                throw new RuntimeException("Location required to fetch tool details");
+            }
         double sourceLat = lat;
         double sourceLng = lng;
 
