@@ -6,6 +6,7 @@ import ReviewForm from '../components/ReviewForm';
 import { getMyTools, deleteTool, getMyToolBookings, updateBookingStatus} from '../api/api';
 import { formatDisplayDate } from '../utils/date';
 import { createFallbackImage } from '../utils/fallbackImage';
+import { buildToolImageUrl } from '../utils/backendUrl';
 
 const statusColors = {
   PENDING: { background: '#fff3cd', color: '#856404', border: '#ffeeba' },
@@ -167,7 +168,8 @@ const MyToolsPage = () => {
           {
             sortedBookings.map((booking) => {
             const statusStyle = statusColors[booking.status] || {};
-
+            const fallbackImage = createFallbackImage('No Image', 120, 120);
+            const imageUrl = buildToolImageUrl(booking.toolId) ?? fallbackImage;
             return (
               <div
                 key={booking.id}
@@ -215,8 +217,12 @@ const MyToolsPage = () => {
                   <div style={{ display: 'flex', gap: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', gap: 14, flex: '1 1 420px', minWidth: 260 }}>
                       <img
-                        src={booking.toolPhotoUrl ? `http://localhost:8080${booking.toolPhotoUrl}` : createFallbackImage('No Image', 120, 120)}
+                        src={imageUrl}
                         alt={booking.toolName}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = fallbackImage;
+                        }}
                         style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #e7e7e7' }}
                       />
                       <div>

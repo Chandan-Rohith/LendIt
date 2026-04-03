@@ -7,13 +7,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,9 +38,13 @@ public class RiskScoreService
     private final ReviewRepository reviewRepository;
     private final RiskScoreRepository riskScoreRepository;
     private final UserRepository userRepository;
+    private final RestTemplate restTemplate;
 
     @Value("${ml.inference.enabled:true}")
     private boolean mlInferenceEnabled;
+
+    @Value("${ml.inference.endpoint:}")
+    private String mlInferenceEndpoint;
 
     @Value("${ml.inference.pythonExecutable:python}")
     private String pythonExecutable;
@@ -84,6 +92,17 @@ public class RiskScoreService
     {
         if (mlInferenceEnabled) 
         {
+            // Try HTTP endpoint first (for separate ML service)
+            if (mlInferenceEndpoint != null && !mlInferenceEndpoint.isBlank()) 
+            {
+                RiskComputationResult httpResult = invokeHttpInference(snapshot);
+                if (httpResult != null) 
+                {
+                    return httpResult;
+                }
+            }
+
+            // Fall back to local Python subprocess
             RiskComputationResult mlResult = invokePythonInference(snapshot);
             if (mlResult != null) 
             {
@@ -92,6 +111,48 @@ public class RiskScoreService
         }
 
         return computeRuleBased(snapshot);
+    }
+
+    private RiskComputationResult invokeHttpInference(FeatureSnapshot snapshot) 
+    {
+        try {
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("avg_rating", snapshot.avgRating());
+            requestBody.put("review_count", snapshot.reviewCount());
+            requestBody.put("avg_damage", snapshot.avgDamage());
+            requestBody.put("avg_experience", snapshot.avgExperience());
+
+            String endpoint = mlInferenceEndpoint.replaceAll("/+$", "") + "/api/ml/risk-score";
+            
+            org.springframework.http.ResponseEntity<Map> response = restTemplate.postForEntity(
+                endpoint,
+                requestBody,
+                Map.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) 
+            {
+                Map<String, Object> body = response.getBody();
+                Map<String, Object> output = (Map<String, Object>) body.get("output");
+                
+                if (output != null) 
+                {
+                    double score = ((Number) output.get("risk_score")).doubleValue();
+                    String classificationRaw = (String) output.get("risk_classification");
+                    
+                    if (!Double.isNaN(score) && classificationRaw != null && !classificationRaw.isBlank()) 
+                    {
+                        RiskClassification classification = RiskClassification.valueOf(classificationRaw.toUpperCase(Locale.ROOT));
+                        return new RiskComputationResult(round2(score), classification);
+                    }
+                }
+            }
+        } 
+        catch (RestClientException | ClassCastException | NullPointerException ignored) 
+        {
+            // Silently fail; will fall back to Python or rule-based
+        }
+        return null;
     }
 
     private RiskComputationResult invokePythonInference(FeatureSnapshot snapshot) 

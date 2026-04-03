@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { backendBaseUrl } from '../utils/backendUrl';
 
 const API = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: `${backendBaseUrl}/api`,
 });
 
 // JWT Interceptor — attaches token to every request automatically

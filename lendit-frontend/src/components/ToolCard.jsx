@@ -3,18 +3,25 @@ import PropTypes from 'prop-types';
 import { FiStar, FiMapPin, FiTrash2 } from 'react-icons/fi';
 import '../App.css';
 import { createFallbackImage } from '../utils/fallbackImage';
+import { buildToolImageUrl } from '../utils/backendUrl';
 
 const ToolCard = ({ tool, onDelete }) => {
   const navigate = useNavigate();
 
-  const imageUrl = tool.photoUrl
-    ? `http://localhost:8080${tool.photoUrl}`
-    : createFallbackImage('No Image', 300, 200);
-
+  const fallbackImage = createFallbackImage('No Image', 300, 200);
+  const imageUrl = buildToolImageUrl(tool.id) ?? fallbackImage;
+  
   return (
     <div className="tool-card" onClick={() => navigate(`/tools/${tool.id}`)}>
       <div className="tool-card-image">
-        <img src={imageUrl} alt={tool.name} />
+        <img
+          src={imageUrl}
+          alt={tool.name}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = fallbackImage;
+          }}
+        />
         {!tool.available && <span className="badge unavailable">Unavailable</span>}
       </div>
       <div className="tool-card-body">

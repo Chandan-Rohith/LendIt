@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { getToolById, getBlockedDates, createBooking, getReviewsByTool } from '../api/api';
 import { formatApiDate, formatDisplayDate } from '../utils/date';
 import { createFallbackImage } from '../utils/fallbackImage';
+import { buildToolImageUrl } from '../utils/backendUrl';
 
 const ToolDetailsPage = () => {
   const { id } = useParams();
@@ -92,9 +93,8 @@ const ToolDetailsPage = () => {
   if (loading) return <div className="loading">Loading tool details...</div>;
   if (!tool) return <div className="error-message">Tool not found</div>;
 
-  const imageUrl = tool.photoUrl
-    ? `http://localhost:8080${tool.photoUrl}`
-    : createFallbackImage('No Image', 600, 350);
+  const fallbackImage = createFallbackImage('No Image', 600, 350);
+  const imageUrl = buildToolImageUrl(tool.id) ?? fallbackImage;
 
   const sortedReviews = [...reviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const latestReview = sortedReviews[0] || null;
@@ -127,6 +127,10 @@ const ToolDetailsPage = () => {
             <img
               src={imageUrl}
               alt={tool.name}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = fallbackImage;
+              }}
               // style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
               style={{maxWidth: '100%',
         maxHeight: '100%',

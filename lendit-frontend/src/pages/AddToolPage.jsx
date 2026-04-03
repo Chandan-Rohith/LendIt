@@ -69,7 +69,8 @@ const AddToolPage = () => {
         'tool',
         new Blob([JSON.stringify(toolData)], { type: 'application/json' })
       );
-      if (imageFile) {
+      if (imageFile) 
+      {
         formData.append('image', imageFile);
       }
 
