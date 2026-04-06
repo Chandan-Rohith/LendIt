@@ -170,9 +170,14 @@ public class BookingService
 
     private BookingResponse mapToResponse(Booking booking, Long currentUserId) 
     {
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
         boolean isBorrower = booking.getBorrower().getId().equals(currentUserId);
         boolean isOwner = booking.getTool().getOwner().getId().equals(currentUserId);
         boolean isBookingParticipant = isBorrower || isOwner;
+        boolean canMarkCompleted = booking.getStatus() == BookingStatus.APPROVED
+            && isBorrower
+            && !today.isBefore(booking.getStartDate())
+            && !today.isAfter(booking.getEndDate());
         boolean canReview = false;
 
         if (booking.getStatus() == BookingStatus.COMPLETED && isBookingParticipant) 
@@ -195,6 +200,7 @@ public class BookingService
                 .startDate(booking.getStartDate())
                 .endDate(booking.getEndDate())
                 .status(booking.getStatus().name())
+                .canMarkCompleted(canMarkCompleted)
                 .canReview(canReview)
                 .build();
     }

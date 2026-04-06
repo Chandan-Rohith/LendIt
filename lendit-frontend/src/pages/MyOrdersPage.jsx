@@ -24,23 +24,6 @@ const getRecentValue = (item) => {
   return Number.isNaN(idValue) ? 0 : idValue;
 };
 
-const parseDateOnly = (value) => {
-  if (!value || typeof value !== 'string') return null;
-  const [year, month, day] = value.split('-').map(Number);
-  if (!year || !month || !day) return null;
-  return new Date(year, month - 1, day);
-};
-
-const isWithinBookedDates = (startDate, endDate) => {
-  const start = parseDateOnly(startDate);
-  const end = parseDateOnly(endDate);
-  if (!start || !end) return false;
-
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return today >= start && today <= end;
-};
-
 const MyOrdersPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,14 +52,6 @@ const MyOrdersPage = () => {
 
   const handleStatusChange = async (bookingId, status) => {
     setError('');
-
-    if (status === 'COMPLETED') {
-      const booking = bookings.find((b) => b.id === bookingId);
-      if (booking && !isWithinBookedDates(booking.startDate, booking.endDate)) {
-        setError('You can mark booking as completed only during the booked dates.');
-        return;
-      }
-    }
 
     try {
       const res = await updateBookingStatus(bookingId, status);
@@ -108,7 +83,7 @@ const MyOrdersPage = () => {
         <div style={{ display: 'grid', gap: 16 }}>
           {sortedBookings.map((booking) => {
             const statusStyle = statusColors[booking.status] || {};
-            const canManuallyComplete = booking.status === 'APPROVED' && isWithinBookedDates(booking.startDate, booking.endDate);
+            const canManuallyComplete = booking.status === 'APPROVED' && booking.canMarkCompleted === true;
             const fallbackImage = createFallbackImage('No Image', 120, 120);
             const imageUrl = buildToolImageUrl(booking.toolId) ?? fallbackImage;
             return (
