@@ -171,11 +171,13 @@ public class BookingService
     private BookingResponse mapToResponse(Booking booking, Long currentUserId) 
     {
         boolean isBorrower = booking.getBorrower().getId().equals(currentUserId);
+        boolean isOwner = booking.getTool().getOwner().getId().equals(currentUserId);
+        boolean isBookingParticipant = isBorrower || isOwner;
         boolean canReview = false;
 
-        if (booking.getStatus() == BookingStatus.COMPLETED && isBorrower) 
+        if (booking.getStatus() == BookingStatus.COMPLETED && isBookingParticipant) 
         {
-            // Borrower can review immediately after completion unless they already submitted one.
+            // Both borrower and owner can review once after completion.
             canReview = reviewRepository.findByBookingIdAndReviewerId(booking.getId(), currentUserId).isEmpty();
         }
 
